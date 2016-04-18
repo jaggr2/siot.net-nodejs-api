@@ -96,7 +96,7 @@ SiotGateway.prototype.retrieveCenterURLs = function ( licenseKey, callback) {
             var parsed = JSON.parse(body);
 
             if(parsed.error_code) {
-                return console.error("siot center lookup returned error code", json);
+                return console.error("siot center lookup returned error code", parsed); // todo
             }
 
             //console.log('response ', parsed);

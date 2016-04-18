@@ -19,7 +19,7 @@ npm install siot.net-nodejs-api --save
 ## Example Siot.net Gateway
 In this example we instantiate a sensor and an actor and register them on the gateway. We also send some dummy sensor values and register a listener for messages for the actor.
 
-    var siot = require('siot.net'),
+    var siot = require('siot.net-nodejs-api'),
         async = require('async');
 
     var gateway = new siot.gateway({
