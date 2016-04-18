@@ -13,7 +13,7 @@ This NodeJS Module implements the siot.net specification to develop such gateway
 ## Installation
 
 ```sh
-npm install siotnet --save
+npm install siot.net-nodejs-api --save
 ```
 
 ## Example Siot.net Gateway
