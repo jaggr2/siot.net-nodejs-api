@@ -1,0 +1,22 @@
+{
+  "name": "siot.net-gateway",
+  "version": "1.0.0",
+  "description": "This module implements the siot.net gateway api specification.",
+  "main": "index.js",
+  "dependencies": {
+    "async": "^1.5.0",
+    "mqtt": "^1.6.1",
+    "mqtt-router": "^0.5.0",
+    "node-uuid": "^1.4.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "siot.net",
+	"iot"
+  ],
+  "author": "Roger Jaggi",
+  "license": "Apache 2.0"
+}
