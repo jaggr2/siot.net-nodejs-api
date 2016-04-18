@@ -1,26 +1,13 @@
 /**
  * Created by roger on 10/27/15.
  */
-var siot = require('./index.js'),
-    async = require('async');
-
-// Weblogin
-//mc2_02_9
-//retoandreas
-var bfhClientId = "561dfb9f19901";
-
+var siot = require('./index.js');
+var async = require('async');
 
 var gateway = new siot.gateway({
-    clientId: bfhClientId,
-    //centerLicense: "5308722854616245",
-    centerLicense: "8FD4-D0CB-E950-4156-B7C5-C450-BCAF-E7BE" //,
-    //mqttCenterURLs: ['mqtt://india313.startdedicated.de']
-    //mqttCenterURLs: ['mqtt://web:1234@formula.xrj.ch']
+    clientId: "INSERT ACCOUNT ID HERE - ONLY NEEDED IF YOU WANT TO DISCOVER YOUR AVAILABLE LICENSES",
+    centerLicense: "INSERT LICENSE HERE"
 });
-
-//gateway.getLicenseList(bfhClientId, function (err, result) {
-//    console.log("getLicenseList OK!");
-//});
 
 var sensor = new siot.sensor({
     uuid: "29d265c1-daf0-4a91-a1d9-45e48239728b",
