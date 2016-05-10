@@ -1,6 +1,6 @@
 {
   "name": "siot.net-nodejs-api",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "This module implements the siot.net gateway api specification.",
   "main": "index.js",
   "dependencies": {
