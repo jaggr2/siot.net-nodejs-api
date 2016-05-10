@@ -16,6 +16,20 @@ This NodeJS Module implements the siot.net specification to develop such gateway
 npm install siot.net-nodejs-api --save
 ```
 
+## Debugging
+The library uses the debug npm module with the tags siotgateway:http and siotgateway:mqtt
+
+To see these debug output, set the environment variable DEBUG=siotgateway:*
+
+### Example for bash 
+
+```sh
+DEBUG=siotgateway:* node siot_dummy_gateway.js
+```
+
+see also https://www.npmjs.com/package/debug for further examples.
+
+
 ## Example Siot.net Gateway
 In this example we instantiate a sensor and an actor and register them on the gateway. We also send some dummy sensor values and register a listener for messages for the actor.
 

@@ -1,11 +1,14 @@
 'use strict';
 
-var mqtt = require('mqtt'),
-    http = require('http'),
-    url = require('url'),
-    util = require('util'),
-    EventEmitter = require('events'),
-    async = require('async');
+var mqtt = require('mqtt');
+var http = require('http');
+var url = require('url');
+var util = require('util');
+var EventEmitter = require('events');
+var async = require('async');
+var debugHTTP = require('debug')('siotgateway:http');
+var debugMQTT = require('debug')('siotgateway:mqtt');
+
 /**
  * [SiotGateway]
  * this class represents the siot.net gateway
@@ -51,7 +54,7 @@ SiotGateway.prototype.getLicenseList = function (clientid, callback) {
         path: '/licence/list?client=' + clientid
     };
 
-    console.log("HTTP GET", options.host + options.path);
+    debugHTTP("HTTP GET " + options.host + options.path);
 
     return http.get(options, function(response) {
         // Continuously update stream with data
@@ -82,7 +85,7 @@ SiotGateway.prototype.retrieveCenterURLs = function ( licenseKey, callback) {
         path: '/?licence=' + licenseKey
     };
 
-    console.log("HTTP GET", options.host + options.path);
+    debugHTTP("HTTP GET " + options.host + options.path);
 
     return http.get(options, function(response) {
         // Continuously update stream with data
@@ -95,11 +98,11 @@ SiotGateway.prototype.retrieveCenterURLs = function ( licenseKey, callback) {
             // Data reception is done, do whatever with it!
             var parsed = JSON.parse(body);
 
-            if(parsed.error_code) {
-                return console.error("siot center lookup returned error code", parsed); // todo
-            }
+            debugHTTP("HTTP GET response: " + body.toString());
 
-            //console.log('response ', parsed);
+            if(parsed.error_code) {
+                return callback(new Error("siot center license lookup returned error"));
+            }
 
             callback(null, parsed);
         });
@@ -115,15 +118,13 @@ SiotGateway.prototype.retrieveCenterURLs = function ( licenseKey, callback) {
  */
 SiotGateway.prototype.retrieveManifest = function (sensorUUID, callback) {
 
-
-    // NOTE: this should not be a call to a REST API. This should be done over MQTT according to the original SIOT specification!
     var options = {
         method: "POST",
         host: this.config.sioturl, //siotConfig.mqttCenterURLs[0],
         path: '/getmanifest?sensorUID=' + sensorUUID
     };
 
-    console.log("HTTP", options.method, options.host + options.path);
+    debugHTTP("HTTP POST " + options.method, options.host + options.path);
 
     var req = http.request(options, function(response) {
         // Continuously update stream with data
@@ -133,14 +134,7 @@ SiotGateway.prototype.retrieveManifest = function (sensorUUID, callback) {
         });
         response.on('end', function() {
 
-            /* Data reception is done, do whatever with it!
-             var parsed = JSON.parse(body);
-
-             if(parsed.error_code) {
-             return console.error("siot center lookup returned error code", json);
-             } */
-
-            console.log('response ', body.toString());
+            debugHTTP("HTTP POST response: " + body.toString());
 
             callback(null, null);
         });
@@ -190,7 +184,7 @@ SiotGateway.prototype.connect = function (callback) {
 
             self.connectedURL = url.format(brokerURL);
 
-            console.log('connecting to: ', self.connectedURL);
+            debugMQTT('connecting to: ' + self.connectedURL);
 
             self.mqttClient = mqtt.connect(self.connectedURL, {
                 reconnectPeriod: 5 * 1000
@@ -200,7 +194,7 @@ SiotGateway.prototype.connect = function (callback) {
                 self.isConnected = true;
                 self.isConnecting = false;
 
-                console.log('changed state to connected');
+                debugMQTT('changed state to connected');
 
                 async.map(self.deviceList, function(device, callback) {
                     device.register(self, callback);
@@ -211,14 +205,14 @@ SiotGateway.prototype.connect = function (callback) {
                 self.isConnecting = false;
                 self.isConnected = false;
 
-                console.log('changed state to disconnected');
+                debugMQTT('changed state to disconnected');
 
                 self.emit('close');
             });
 
             self.mqttClient.on('reconnect', function() {
                 self.isConnecting = true;
-                console.log('changed state to reconnecting');
+                debugMQTT('changed state to reconnecting');
                 self.emit('reconnect');
             });
 
@@ -278,13 +272,13 @@ SiotGateway.prototype.registerDevice = function (device, callback) {
 
     device.on('_unregister_sensor', function(deviceUUID) {
         self.unsubscribe(deviceUUID, "DAT", function(err) {
-            if(err) console.error(err);
+            if(err) debugMQTT(err);
         });
     });
 
     device.on('_register_sensor', function(deviceUUID) {
         self.subscribe(deviceUUID, "DAT", function(err) {
-            if(err) console.error(err);
+            if(err) debugMQTT(err);
         });
     });
 
@@ -328,7 +322,7 @@ SiotGateway.prototype.unregisterDevice = function (device, callback) {
  * @param {function} callback the result
  */
 SiotGateway.prototype.publish = function (deviceUUID, type, payloadString, callback) {
-    console.log("PUBLISH ", this.config.mqttPrefix + '/' + type + '/' + this.config.centerLicense + '/' + deviceUUID + '', payloadString);
+    debugMQTT("PUBLISH ", this.config.mqttPrefix + '/' + type + '/' + this.config.centerLicense + '/' + deviceUUID + '', payloadString);
     this.mqttClient.publish(this.config.mqttPrefix + '/' + type + '/' + this.config.centerLicense + '/' + deviceUUID + '', payloadString, callback);
 };
 
@@ -340,7 +334,7 @@ SiotGateway.prototype.publish = function (deviceUUID, type, payloadString, callb
  * @param {function} callback the result
  */
 SiotGateway.prototype.subscribe = function (deviceUUID, type, callback) {
-    console.log("SUBSCRIBE ", this.config.mqttPrefix + '/' + type + '/' + this.config.centerLicense + '/' + deviceUUID + '');
+    debugMQTT("SUBSCRIBE ", this.config.mqttPrefix + '/' + type + '/' + this.config.centerLicense + '/' + deviceUUID + '');
     this.mqttClient.subscribe(this.config.mqttPrefix + '/' + type + '/' + this.config.centerLicense + '/' + deviceUUID + '', callback);
 };
 
@@ -352,7 +346,7 @@ SiotGateway.prototype.subscribe = function (deviceUUID, type, callback) {
  * @param {function} callback the result
  */
 SiotGateway.prototype.unsubscribe = function (deviceUUID, type, callback) {
-    console.log("UNSUBSCRIBE ", this.config.mqttPrefix + '/' + type + '/' + this.config.centerLicense + '/' + deviceUUID + '');
+    debugMQTT("UNSUBSCRIBE ", this.config.mqttPrefix + '/' + type + '/' + this.config.centerLicense + '/' + deviceUUID + '');
     this.mqttClient.unsubscribe(this.config.mqttPrefix + '/' + type + '/' + this.config.centerLicense + '/' + deviceUUID + '', callback);
 };
 

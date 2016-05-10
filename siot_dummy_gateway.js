@@ -6,7 +6,7 @@ var async = require('async');
 
 var gateway = new siot.gateway({
     clientId: "INSERT ACCOUNT ID HERE - ONLY NEEDED IF YOU WANT TO DISCOVER YOUR AVAILABLE LICENSES",
-    centerLicense: "INSERT LICENSE HERE"
+    centerLicense: "INSERT-LICENSE-HERE"
 });
 
 var sensor = new siot.sensor({
