@@ -19,5 +19,13 @@
     "iot"
   ],
   "author": "Roger Jaggi",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jaggr2/siot.net-nodejs-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jaggr2/siot.net-nodejs-api/issues"
+  },
+  "homepage": "https://github.com/jaggr2/siot.net-nodejs-api#readme"
 }
