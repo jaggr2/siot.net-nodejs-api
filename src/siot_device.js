@@ -1,6 +1,6 @@
 'use strict';
 
-var uuid = require("node-uuid"),
+var uuid = require("uuid"),
     util = require('util'),
     EventEmitter = require('events'),
     async = require('async');
